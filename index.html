@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>lululemon — AI Workforce Transformation: Board &amp; Management Discussion Tool</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{--lulu:#8B2332;--lulu-dark:#5C1722;--lulu-light:#F2E8EA;--lulu-accent:#C4384A;--black:#1a1a1a;--text:#2c2c2c;--text-light:#666;--bg:#fafafa;--card:#fff;--border:#e5e5e5;--green:#1b8a5a;--red:#c0392b;--amber:#d4890b;--blue:#2E75B6}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;font-size:15px}
+
+.nav{position:fixed;top:0;left:0;right:0;background:var(--black);z-index:100;border-bottom:3px solid var(--lulu)}
+.nav-inner{max-width:1300px;margin:0 auto;padding:12px 32px;display:flex;align-items:center;justify-content:space-between}
+.nav-brand{font-size:13px;font-weight:700;letter-spacing:3px;text-transform:lowercase;color:#fff}
+.nav-brand span{color:var(--lulu-accent)}
+.nav-sub{color:rgba(255,255,255,.4);font-size:11px;margin-left:12px;letter-spacing:1px;text-transform:uppercase}
+.nav-right{color:rgba(255,255,255,.5);font-size:11px}
+
+.hero{background:linear-gradient(135deg,var(--lulu-dark) 0%,var(--lulu) 50%,#A03040 100%);padding:120px 32px 60px;color:#fff}
+.hero-inner{max-width:1000px;margin:0 auto}
+.hero-badge{display:inline-block;border:1px solid rgba(255,255,255,.3);color:rgba(255,255,255,.8);font-size:10px;font-weight:700;letter-spacing:2px;padding:4px 12px;border-radius:3px;margin-bottom:20px;text-transform:uppercase}
+.hero h1{font-family:Georgia,serif;font-size:clamp(28px,4vw,42px);font-weight:700;line-height:1.15;margin-bottom:16px}
+.hero p{font-size:15px;color:rgba(255,255,255,.65);max-width:700px;margin-bottom:32px}
+.hero-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;border-top:1px solid rgba(255,255,255,.12);padding-top:24px}
+.hero-stat label{display:block;font-size:9px;font-weight:600;color:rgba(255,255,255,.5);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px}
+.hero-stat .val{font-size:20px;font-weight:700}
+.hero-stat .sub{font-size:10px;color:rgba(255,255,255,.4);margin-top:1px}
+
+.section{max-width:1200px;margin:0 auto;padding:48px 32px}
+.section-label{font-size:10px;font-weight:700;color:var(--lulu);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
+.section h2{font-family:Georgia,serif;font-size:24px;color:var(--black);margin-bottom:12px}
+.section p.desc{font-size:14px;color:var(--text-light);margin-bottom:20px;max-width:800px}
+
+hr.div{border:none;border-top:1px solid var(--border);margin:0}
+
+/* Controls */
+.controls{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:28px;margin:20px 0}
+.controls-title{font-size:16px;font-weight:700;color:var(--black);margin-bottom:4px}
+.controls-sub{font-size:12px;color:var(--text-light);margin-bottom:20px}
+.ctrl-stack{display:flex;flex-direction:column;gap:0}
+.ctrl-group{padding:20px 0}
+.ctrl-group+.ctrl-group{border-top:1px solid var(--border)}
+.ctrl-group label{display:block;font-size:14px;font-weight:600;color:var(--black);margin-bottom:10px;line-height:1.4}
+.ctrl-group .range-row{display:flex;align-items:center;gap:16px}
+.ctrl-group input[type=range]{flex:1;accent-color:var(--lulu);height:8px;-webkit-appearance:none;appearance:none;background:#e5e5e5;border-radius:4px;outline:none;cursor:pointer}
+.ctrl-group input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--lulu);border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.25);cursor:pointer}
+.ctrl-group input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--lulu);border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.25);cursor:pointer}
+.ctrl-group .val-display{font-size:14px;font-weight:700;color:var(--lulu);min-width:100px;text-align:right;white-space:nowrap}
+.ctrl-group .range-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--text-light);margin-top:6px;padding:0 2px;margin-right:116px}
+.ctrl-group .helper{font-size:12px;color:var(--text-light);margin-top:8px;line-height:1.5;font-style:italic;margin-right:116px}
+
+/* KPI strip */
+.kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:20px 0}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;text-align:center;transition:all .2s}
+.kpi .k-val{font-size:26px;font-weight:700;color:var(--lulu)}
+.kpi .k-label{font-size:11px;color:var(--text-light);margin-top:2px}
+.kpi .k-delta{font-size:11px;font-weight:600;margin-top:4px}
+.k-delta.pos{color:var(--green)}.k-delta.neg{color:var(--red)}.k-delta.amber{color:var(--amber)}
+.kpi.alert{border-color:var(--red);background:#fef5f5}
+.kpi.alert .k-val{color:var(--red)}
+.kpi.good{border-color:var(--green);background:#f5fef8}
+.kpi.good .k-val{color:var(--green)}
+
+
+/* Charts */
+.chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:20px 0}
+.chart-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px}
+.chart-card h3{font-size:14px;font-weight:700;color:var(--black);margin-bottom:12px}
+.chart-wrap{position:relative;height:320px}
+
+/* Function table */
+.fn-table{width:100%;border-collapse:collapse;font-size:12px;margin:20px 0}
+.fn-table thead th{background:var(--black);color:#fff;padding:10px 12px;text-align:left;font-size:11px;font-weight:600;letter-spacing:.5px;position:sticky;top:52px;z-index:10}
+.fn-table thead th.num{text-align:center}
+.fn-table tbody td{padding:10px 12px;border-bottom:1px solid #f0f0f0;vertical-align:middle}
+.fn-table tbody td.num{text-align:center;font-weight:600}
+.fn-table tbody tr:hover{background:var(--lulu-light)}
+.fn-table .fn-name{font-weight:600;color:var(--black)}
+.fn-table .segment-row td{background:var(--lulu);color:#fff;font-weight:700;font-size:12px;letter-spacing:.5px}
+.fn-table .sacred-row td{background:#f0fdf4}
+.fn-table .sacred-badge{display:inline-block;background:var(--green);color:#fff;font-size:8px;font-weight:700;letter-spacing:1px;padding:2px 6px;border-radius:3px;margin-left:6px;text-transform:uppercase;vertical-align:middle}
+.fn-table .redeploy-badge{display:inline-block;background:var(--blue);color:#fff;font-size:8px;font-weight:700;letter-spacing:1px;padding:2px 6px;border-radius:3px;margin-left:6px;text-transform:uppercase;vertical-align:middle}
+.bar-cell{position:relative;min-width:100px}
+.bar-bg{height:20px;border-radius:3px;display:flex;align-items:center;padding-left:6px;font-size:10px;font-weight:600;color:#fff;min-width:2px}
+
+/* Slider Guide */
+.guide-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px 28px;margin:16px 0}
+.guide-card h4{font-size:15px;font-weight:700;color:var(--black);margin-bottom:4px}
+.guide-card .guide-sub{font-size:12px;color:var(--text-light);margin-bottom:16px}
+.option-row{display:grid;grid-template-columns:140px 1fr;gap:16px;padding:14px 0;border-top:1px solid #f0f0f0}
+.option-label{font-size:13px;font-weight:700;white-space:nowrap}
+.option-rationale{font-size:13px;color:var(--text-light);line-height:1.55}
+@media(max-width:900px){.option-row{grid-template-columns:1fr;gap:4px}}
+
+.footer{background:var(--black);color:rgba(255,255,255,.4);padding:24px;text-align:center;font-size:11px}
+
+@media(max-width:900px){
+  .chart-grid,.discuss-grid{grid-template-columns:1fr}
+  .hero-stats{grid-template-columns:repeat(3,1fr)}
+  .kpi-strip{grid-template-columns:1fr !important}
+  .ctrl-group .range-labels{margin-right:116px}
+  .ctrl-group input[type=range]{height:10px}
+  .ctrl-group input[type=range]::-webkit-slider-thumb{width:28px;height:28px}
+  .ctrl-group input[type=range]::-moz-range-thumb{width:28px;height:28px}
+  .controls{padding:20px 18px}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav"><div class="nav-inner">
+  <div><span class="nav-brand">lululemon<span> athletica</span></span><span class="nav-sub">Board &amp; Management Discussion Tool</span></div>
+  <div class="nav-right">CONFIDENTIAL | April 2026 | Prepared by Marc Abergel</div>
+</div></nav>
+
+<div class="hero"><div class="hero-inner">
+  <div class="hero-badge">AI Transformation &times; Movement Nation</div>
+  <h1>How can AI-enabled transformation generate savings to fund the Movement Nation strategy?</h1>
+  <p>This tool helps the board and management explore AI transformation scenarios to unlock capital to fund Movement Nation investments. Scenarios are constrained to options that enable the Movement Nation, e.g., if a configuration would gut the human infrastructure that makes the Movement Nation impossible to execute, it is excluded from the option set.</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><label>Employees</label><div class="val">39,000</div><div class="sub">FY2025</div></div>
+    <div class="hero-stat"><label>Revenue</label><div class="val">$10.6B</div><div class="sub">FY2025</div></div>
+    <div class="hero-stat"><label>SG&A</label><div class="val">$3.9B</div><div class="sub">37% of revenue</div></div>
+    <div class="hero-stat"><label>Market Cap</label><div class="val">$18.4B</div><div class="sub">Down 56% YoY</div></div>
+    <div class="hero-stat"><label>Op. Margin</label><div class="val">~20%</div><div class="sub">Target: expand</div></div>
+  </div>
+</div></div>
+
+<div class="section">
+  <div class="section-label">Configure Assumptions</div>
+  <h2>Three questions for the board and management</h2>
+  <p class="desc">The first two sliders shape the AI transformation scenario: how fast is AI improving, and how aggressively should we adopt it? The third determines how the freed capital is allocated between Movement Nation investment and margin expansion.</p>
+
+  <div class="controls">
+    <div class="controls-title">Transformation Parameters</div>
+    <div class="controls-sub">Drag the sliders to explore different futures. All charts, tables, and outputs update in real-time.</div>
+    <div class="ctrl-stack">
+      <div class="ctrl-group" style="padding-top:0">
+        <label>1. How fast do we believe AI capabilities will improve?</label>
+        <div class="range-row">
+          <input type="range" id="sl-pace" min="0" max="100" value="50" oninput="update()">
+          <span class="val-display" id="vd-pace">Moderate</span>
+        </div>
+        <div class="range-labels"><span>Slow</span><span>Moderate</span><span>Rapid</span></div>
+        <div class="helper">Slow = today's tools plateau. Moderate = steady improvement each quarter. Rapid = step-change capabilities within 12&ndash;18 months.</div>
+      </div>
+      <div class="ctrl-group">
+        <label>2. How fast can we integrate and scale AI capabilities?</label>
+        <div class="range-row">
+          <input type="range" id="sl-aggression" min="0" max="100" value="50" oninput="update()">
+          <span class="val-display" id="vd-aggression">Moderate</span>
+        </div>
+        <div class="range-labels"><span>Conservative</span><span>Moderate</span><span>Aggressive</span></div>
+        <div class="helper">Applies to: corporate functions, GEC, distribution, logistics, inventory ops. These are vision-compatible &mdash; efficiency here funds the moat.</div>
+      </div>
+      <div class="ctrl-group" style="padding-bottom:0">
+        <label>3. How much freed capital should fund Movement Nation?</label>
+        <div class="range-row">
+          <input type="range" id="sl-reinvest" min="0" max="100" value="50" oninput="update()">
+          <span class="val-display" id="vd-reinvest">50%</span>
+        </div>
+        <div class="range-labels"><span>0% &mdash; All to margin</span><span>50/50</span><span>100% &mdash; All to MN</span></div>
+        <div class="helper">Determines the split between Movement Nation investment (embassies, programming, community) and bottom-line margin expansion.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="div">
+
+<div class="section">
+  <div class="section-label">Scenario Outputs</div>
+  <h2 id="scenario-title">Moderate AI Adoption</h2>
+  <p class="desc" id="scenario-desc">Expanding AI into merchandising, supply chain, and GEC automation. Retail sacred roles preserved. Meaningful Movement Nation investment enabled.</p>
+
+  <p style="font-size:11px;color:var(--text-light);font-style:italic;margin-bottom:8px">All headcount and financial figures are rough estimates for scenario modelling purposes only.</p>
+  <div class="kpi-strip" style="grid-template-columns:repeat(3,1fr)">
+    <div class="kpi"><div class="k-val" id="k-fte">3,200</div><div class="k-label">FTEs Reduced (24 mo)</div><div class="k-delta pos" id="k-fte-pct">-8.2% of workforce</div></div>
+    <div class="kpi"><div class="k-val" id="k-mn-invest" style="color:var(--lulu)">$96M</div><div class="k-label">Movement Nation Investment</div><div class="k-delta pos" id="k-mn-sub">annual reinvestment</div></div>
+    <div class="kpi"><div class="k-val" id="k-margin">$97M</div><div class="k-label">Remaining for Margin &amp; Other</div><div class="k-delta pos" id="k-margin-sub">available for bottom line, buybacks, etc.</div></div>
+  </div>
+
+  <div style="background:linear-gradient(135deg,#1a1a1a 0%,#2a1520 100%);border-radius:12px;padding:28px 32px;margin:20px 0;color:#fff">
+    <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--lulu-accent);margin-bottom:8px">The Movement Nation Constraint</div>
+    <div style="font-family:Georgia,serif;font-size:20px;font-weight:700;margin-bottom:12px;line-height:1.3">AI savings don't just fund the Movement Nation &mdash; the Movement Nation determines which savings are permissible.</div>
+    <p style="font-size:14px;color:rgba(255,255,255,.7);line-height:1.65;max-width:900px;margin-bottom:16px">A scenario that guts Educators to fund embassies has destroyed the human layer that makes embassies work. The people <em>are</em> the strategy. This tool enforces that constraint: back-office and operational efficiency fund the vision; frontline community roles are <strong style="color:#fff">sacred infrastructure</strong>, protected by design. Where retail roles are optimized, they are <strong style="color:#fff">redeployed</strong> into Movement Nation programming &mdash; not eliminated.</p>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+      <div style="background:rgba(255,255,255,.08);border-radius:8px;padding:14px;text-align:center">
+        <div style="font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--lulu-accent);margin-bottom:4px">Material Superiority</div>
+        <div style="font-size:13px;color:rgba(255,255,255,.8)">Fabric R&D, biomechanics lab, compression mapping, Decade Guarantee</div>
+      </div>
+      <div style="background:rgba(255,255,255,.08);border-radius:8px;padding:14px;text-align:center">
+        <div style="font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--lulu-accent);margin-bottom:4px">Civic Identity</div>
+        <div style="font-size:13px;color:rgba(255,255,255,.8)">Citizenship earned through sweat, ambassador ecosystems, discipline certification</div>
+      </div>
+      <div style="background:rgba(255,255,255,.08);border-radius:8px;padding:14px;text-align:center">
+        <div style="font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--lulu-accent);margin-bottom:4px">Sovereign Spaces</div>
+        <div style="font-size:13px;color:rgba(255,255,255,.8)">Flagship embassies, recovery centres, rooftop studios, community gathering</div>
+      </div>
+      <div style="background:rgba(255,255,255,.08);border-radius:8px;padding:14px;text-align:center">
+        <div style="font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--lulu-accent);margin-bottom:4px">Mythmaking</div>
+        <div style="font-size:13px;color:rgba(255,255,255,.8)">lulu cinema, movement documentaries, citizen profiles, pilgrimage experiences</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chart-grid">
+    <div class="chart-card">
+      <h3>Headcount Impact by Function (24 months)</h3>
+      <div class="chart-wrap"><canvas id="chart-headcount"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h3>Capital Freed by Segment ($M annual)</h3>
+      <div class="chart-wrap"><canvas id="chart-value"></canvas></div>
+    </div>
+  </div>
+
+</div>
+
+<hr class="div">
+
+<div class="section">
+  <div class="section-label">Function-by-Function Detail</div>
+  <h2>Where AI replaces headcount, where it redeploys, and where it doesn't touch</h2>
+  <p class="desc" style="font-style:italic;color:var(--amber)">Note: All headcount figures are rough estimates intended to illustrate directional scale, not precise staffing data.</p>
+  <p class="desc">Roles marked <span style="display:inline-block;background:#1b8a5a;color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;letter-spacing:.5px">SACRED</span> are Movement Nation infrastructure &mdash; protected from cuts. Roles marked <span style="display:inline-block;background:#2E75B6;color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;letter-spacing:.5px">REDEPLOY</span> shift from transactional duties to community programming.</p>
+
+  <div style="overflow-x:auto">
+    <table class="fn-table" id="fn-table">
+      <thead>
+        <tr>
+          <th style="min-width:200px">Function</th>
+          <th class="num" style="width:80px">Current FTEs</th>
+          <th class="num" style="width:80px">Reduced</th>
+          <th class="num" style="width:80px">Remaining</th>
+          <th style="min-width:100px">Reduction</th>
+          <th style="min-width:240px">Rationale</th>
+        </tr>
+      </thead>
+      <tbody id="fn-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<hr class="div">
+
+<div class="section">
+  <div class="section-label">Slider Guide</div>
+  <h2>The three questions, their options, and the rationale for each</h2>
+  <p class="desc">Each slider represents a distinct decision or belief. This guide explains what each setting implies and when it makes sense.</p>
+
+  <div class="guide-card">
+    <h4>1. How fast do we believe AI capabilities will improve?</h4>
+    <div class="guide-sub">This is a belief about the world, not a strategic choice. It determines the ceiling on what AI can automate within the planning horizon.</div>
+    <div class="option-row">
+      <div class="option-label" style="color:var(--green)">Slow</div>
+      <div class="option-rationale">Today's tools plateau. LLMs and automation hit diminishing returns within 6&ndash;12 months. Plan around current-generation capabilities only. Conservative assumption &mdash; appropriate if you believe AI progress is overhyped or regulatory constraints will slow deployment.</div>
+    </div>
+    <div class="option-row">
+      <div class="option-label" style="color:var(--amber)">Moderate</div>
+      <div class="option-rationale">Steady, compounding improvement each quarter. New capabilities unlock new use cases at a predictable pace. The consensus view among most enterprise AI teams. Plans built on this assumption have the widest margin of safety.</div>
+    </div>
+    <div class="option-row">
+      <div class="option-label" style="color:var(--red)">Rapid</div>
+      <div class="option-rationale">Step-change capabilities within 12&ndash;18 months. Agentic systems handle complex workflows end-to-end. Roles that seem safe today become automatable. Appropriate if you believe frontier labs are about to deliver a capability leap &mdash; and that lululemon should plan for it now.</div>
+    </div>
+  </div>
+
+  <div class="guide-card">
+    <h4>2. How fast can we integrate and scale AI capabilities?</h4>
+    <div class="guide-sub">This is a strategic and operational choice. Even if AI improves rapidly, integration speed depends on internal readiness, change management, and risk appetite.</div>
+    <div class="option-row">
+      <div class="option-label" style="color:var(--green)">Conservative</div>
+      <div class="option-rationale">Deploy only proven, low-risk AI in back-office functions. Pilot before scaling. Prioritize employee experience and change management. Slower capital unlock but minimal execution risk. Appropriate if the organisation has limited AI maturity or leadership bandwidth.</div>
+    </div>
+    <div class="option-row">
+      <div class="option-label" style="color:var(--amber)">Moderate</div>
+      <div class="option-rationale">Expand AI into merchandising, supply chain, and GEC automation in parallel. Dedicated transformation team drives adoption. Balanced pace &mdash; meaningful savings within 12&ndash;18 months without overwhelming the organisation. The most common posture for large retailers.</div>
+    </div>
+    <div class="option-row">
+      <div class="option-label" style="color:var(--red)">Aggressive</div>
+      <div class="option-rationale">Maximum AI deployment across every non-sacred function simultaneously. Requires significant upfront investment in tooling, talent, and change management. Largest capital unlock but highest execution risk. Appropriate if competitive pressure or market conditions demand urgency.</div>
+    </div>
+  </div>
+
+  <div class="guide-card">
+    <h4>3. How much freed capital should fund Movement Nation?</h4>
+    <div class="guide-sub">This is the core strategic allocation question. It determines how AI savings are split between funding the vision and expanding margins.</div>
+    <div class="option-row">
+      <div class="option-label" style="color:var(--text-light)">0% &mdash; All to margin</div>
+      <div class="option-rationale">Every dollar of AI savings flows to the bottom line. Maximum near-term margin expansion and earnings recovery. Appropriate if the board believes the current strategy is sufficiently funded and the priority is restoring investor confidence through profitability.</div>
+    </div>
+    <div class="option-row">
+      <div class="option-label" style="color:var(--amber)">50/50 split</div>
+      <div class="option-rationale">Half funds Movement Nation, half flows to margin. Demonstrates fiscal discipline to investors while visibly investing in the long-term moat. The balanced posture &mdash; appropriate when you need to serve both the stock price and the 10-year brand thesis simultaneously.</div>
+    </div>
+    <div class="option-row">
+      <div class="option-label" style="color:var(--lulu)">100% &mdash; All to MN</div>
+      <div class="option-rationale">Every dollar of AI savings is reinvested into Movement Nation: flagship embassies, ambassador ecosystems, citizenship platforms, community programming. No near-term margin benefit. Appropriate if the board has conviction that Movement Nation is the primary value driver and is willing to defer earnings expansion.</div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">lululemon athletica &mdash; Movement Nation Transformation Framework &mdash; Confidential Board &amp; Management Material &mdash; April 2026</div>
+
+<script>
+// ═══ FUNCTION DATA ═══
+// segment, name, currentFTEs, baseReductionPct, medReductionPct, aggReductionPct, rationale, flags
+// flags: "sacred" = protected from cuts, "redeploy" = optimized + redeployed to MN roles, "" = standard
+// Fully-loaded cost per FTE by segment (salary + benefits + payroll tax + overhead)
+const segmentCosts = {
+  'CORPORATE': 115000,    // Corporate/SSC roles: avg ~$115K fully loaded
+  'GUEST': 52000,         // GEC agents: avg ~$52K fully loaded
+  'RETAIL': 45000,        // Retail hourly (inventory, VM): avg ~$45K fully loaded
+  'DISTRIBUTION': 55000   // DC & logistics: avg ~$55K fully loaded
+};
+const functions = [
+  // Corporate
+  ["CORPORATE / STORE SUPPORT (~2,500)", null, null, null, null, null, null, null],
+  ["", "Marketing & Brand", 350, 0.20, 0.40, 0.60, "Content production automated; senior brand strategists and community storytellers retained as Movement Nation mythmakers", ""],
+  ["", "Technology & Digital", 300, 0.08, 0.15, 0.25, "Developer productivity gains via AI coding tools; freed capacity redirected to Movement Nation digital platforms", ""],
+  ["", "Finance & Accounting", 200, 0.15, 0.30, 0.50, "Reporting, reconciliation, and forecasting automated; strategic FP&A retained to model Movement Nation investment returns", ""],
+  ["", "Merchandising & Planning", 250, 0.10, 0.25, 0.45, "Allocation and pricing shift to algorithmic; human oversight retained for brand curation and embassy-specific assortment", ""],
+  ["", "Supply Chain & Sourcing", 250, 0.08, 0.20, 0.35, "Demand planning and vendor scoring automated; sourcing judgment retained for proprioceptive fabric partnerships", ""],
+  ["", "People & Culture (HR)", 200, 0.12, 0.25, 0.40, "Recruiting and benefits admin automated; HRBPs retained to manage Educator role transformation and citizenship culture", ""],
+  ["", "Product Design & Dev", 400, 0.05, 0.15, 0.30, "AI augments concept generation and tech specs; core design talent retained \u2014 they are the Material Superiority pillar", ""],
+  ["", "Legal & Compliance", 80, 0.05, 0.15, 0.30, "Contract review and regulatory scanning automated; strategic legal judgment retained", ""],
+  ["", "Communications & PR", 50, 0.15, 0.35, 0.55, "Press materials and media monitoring automated; narrative architects retained for Movement Nation storytelling", ""],
+  ["", "Real Estate & Store Dev", 100, 0.05, 0.10, 0.20, "Site analytics automated; embassy design vision requires human judgment \u2014 these are the Sovereign Spaces builders", ""],
+  ["", "Sustainability & ESG", 30, 0.05, 0.10, 0.20, "Data collection and reporting automated; strategy retained for Decade Guarantee and environmental stewardship", ""],
+  ["", "Strategy & Transformation", 50, 0.00, 0.05, 0.15, "Research augmented by AI; strategic judgment is the entire point of this function", ""],
+  ["", "Executive & Admin", 120, 0.10, 0.20, 0.35, "Administrative tasks automated; executive capacity freed for Movement Nation governance", ""],
+  ["", "Other Corporate", 120, 0.10, 0.20, 0.35, "Shared services and internal audit streamlined through automation", ""],
+
+  ["GUEST EDUCATION CENTER (~1,500)", null, null, null, null, null, null, null],
+  ["", "Customer Service Agents", 1200, 0.40, 0.60, 0.80, "High-volume transactional queries fully automated; VIP and complex cases remain human \u2014 vision-compatible", ""],
+  ["", "GEC Management & QA", 200, 0.10, 0.25, 0.40, "Fewer agents = fewer managers; AI handles quality sampling at scale", ""],
+  ["", "Training & Knowledge", 100, 0.10, 0.20, 0.35, "AI knowledge base self-updates; remaining staff focus on Educator training for Movement Nation programming", ""],
+
+  ["RETAIL STORES (~32,000) \u2014 MOVEMENT NATION FRONTLINE", null, null, null, null, null, null, null],
+  ["", "Educators (Sales)", 22000, 0.00, 0.00, 0.00, "SACRED: Educators are the human embodiment of Movement Nation. No headcount reduction in any scenario. AI handles scheduling; freed time shifts to community programming, ambassador relationships, and citizenship onboarding", "sacred"],
+  ["", "Key Leaders (Supervisors)", 3800, 0.00, 0.00, 0.00, "SACRED: Community leadership cannot be automated. No headcount reduction in any scenario. AI handles scheduling and task assignment; Key Leaders shift to local ambassador coordination and event programming", "sacred"],
+  ["", "Store Mgrs & Asst Mgrs", 2300, 0.00, 0.00, 0.00, "SACRED: Embassy directors, not store managers. No headcount reduction in any scenario. AI dashboards free them from reporting; time redirects to community building and citizenship program oversight", "sacred"],
+  ["", "Visual Merchandisers", 1500, 0.03, 0.08, 0.15, "Partial redeploy: AI planograms handle standard layouts; VMs become embassy experience designers, creating locally relevant sovereign spaces", "redeploy"],
+  ["", "Inventory / Operations", 2400, 0.08, 0.18, 0.35, "Vision-compatible: RFID and AI inventory systems automate counting, receiving, and replenishment \u2014 freeing floor staff for guest-facing work", ""],
+
+  ["DISTRIBUTION & LOGISTICS (~3,000)", null, null, null, null, null, null, null],
+  ["", "DC Workers", 2200, 0.08, 0.20, 0.40, "Vision-compatible: Warehouse automation does not touch the community layer. Robotics and AI picking/packing improve throughput", ""],
+  ["", "DC Management", 400, 0.05, 0.12, 0.25, "Automated systems reduce management span; AI handles scheduling and predictive maintenance", ""],
+  ["", "Transportation & Logistics", 400, 0.05, 0.15, 0.30, "Route planning, carrier selection, and demand forecasting automated \u2014 no community impact", ""],
+];
+
+let chartHeadcount, chartValue;
+
+function getReductionPct(base, med, agg, aggression, pace) {
+  const paceMult = 0.6 + (pace / 100) * 0.8;
+  let pct;
+  if (aggression <= 33) {
+    pct = base + (med - base) * (aggression / 33);
+  } else if (aggression <= 66) {
+    pct = med + (agg - med) * ((aggression - 33) / 33);
+  } else {
+    pct = agg * (0.85 + 0.15 * ((aggression - 66) / 34));
+  }
+  return Math.min(pct * paceMult, 0.90);
+}
+
+function update() {
+  const aggression = +document.getElementById('sl-aggression').value;
+  const pace = +document.getElementById('sl-pace').value;
+  const reinvestPct = +document.getElementById('sl-reinvest').value;
+
+  // Labels
+  const aggLabel = aggression <= 20 ? 'Conservative' : aggression <= 60 ? 'Moderate' : aggression <= 84 ? 'Aggressive' : 'Very Aggressive';
+  const paceLabel = pace <= 20 ? 'Slow' : pace <= 60 ? 'Moderate' : pace <= 84 ? 'Rapid' : 'Very Rapid';
+  document.getElementById('vd-aggression').textContent = aggLabel;
+  document.getElementById('vd-pace').textContent = paceLabel;
+  document.getElementById('vd-reinvest').textContent = reinvestPct + '%';
+  document.getElementById('scenario-title').textContent = `${paceLabel} AI Improvement, ${aggLabel} Integration`;
+
+  const descs = {
+    'Conservative': 'Deploying proven, low-risk AI in back-office and operations. Retail frontline fully protected. Movement Nation funded through operational efficiency.',
+    'Moderate': 'Expanding AI into merchandising, supply chain, and GEC automation. Retail sacred roles preserved. Meaningful Movement Nation investment enabled.',
+    'Aggressive': 'Maximum back-office and operational AI deployment. Retail staffing optimized through scheduling only \u2014 no model reduction. Largest Movement Nation investment pool.',
+    'Very Aggressive': 'Full AI-native operations in every non-sacred function. Educators, Key Leaders, and Store Managers protected by design. Vision-first transformation at scale.'
+  };
+  document.getElementById('scenario-desc').textContent = descs[aggLabel] || descs['Moderate'];
+
+  // Calculate reductions with tiered costs by segment
+  const fnData = [];
+  let totalReduced = 0, totalCurrent = 0, totalGrossSavings = 0;
+  let currentSegKey = '';
+
+  functions.forEach(f => {
+    if (f[1] === null) {
+      // Determine segment key from header
+      if (f[0].includes('CORPORATE')) currentSegKey = 'CORPORATE';
+      else if (f[0].includes('GUEST')) currentSegKey = 'GUEST';
+      else if (f[0].includes('RETAIL')) currentSegKey = 'RETAIL';
+      else if (f[0].includes('DISTRIBUTION')) currentSegKey = 'DISTRIBUTION';
+      return;
+    }
+    const [seg, name, current, basePct, medPct, aggPct, rationale, flags] = f;
+    const reduction = getReductionPct(basePct, medPct, aggPct, aggression, pace);
+    const reduced = Math.round(current * reduction);
+    const remaining = current - reduced;
+    const costPerFte = segmentCosts[currentSegKey] || 65000;
+    if (flags !== 'sacred') {
+      totalReduced += reduced;
+      totalGrossSavings += reduced * costPerFte;
+    }
+    totalCurrent += current;
+    fnData.push({ name, current, reduced, remaining, reduction, rationale, flags, segment: currentSegKey, costPerFte });
+
+  });
+
+  // Financial model
+  const grossSavings = Math.round(totalGrossSavings / 1e6);
+  const aiInvestment = Math.round(grossSavings * 0.12); // 12% for AI tooling
+  const capitalFreed = grossSavings - aiInvestment;
+  const marginBps = Math.round(capitalFreed / 10600 * 10000);
+  const mktCapCreation = (capitalFreed / 1000 * 10).toFixed(1);
+
+  // Reinvestment split
+  const mnInvest = Math.round(capitalFreed * reinvestPct / 100);
+  const toMargin = capitalFreed - mnInvest;
+  const marginBpsActual = Math.round(toMargin / 10600 * 10000);
+
+  // Update KPIs
+  document.getElementById('k-fte').textContent = totalReduced.toLocaleString();
+  document.getElementById('k-fte-pct').textContent = `-${(totalReduced/39000*100).toFixed(1)}% of workforce · $${capitalFreed}M total freed`;
+  document.getElementById('k-mn-invest').textContent = `$${mnInvest}M`;
+  document.getElementById('k-mn-sub').textContent = `${reinvestPct}% of $${capitalFreed}M freed capital`;
+  document.getElementById('k-margin').textContent = `$${toMargin}M`;
+  document.getElementById('k-margin-sub').textContent = `+${marginBpsActual} bps if flowed to bottom line`;
+
+  // ═══ CHARTS ═══
+  const topFns = [...fnData].filter(f => f.flags !== 'sacred').sort((a,b) => b.reduced - a.reduced).slice(0, 12);
+  const barColors = topFns.map(f => f.flags === 'sacred' ? '#1b8a5a' : f.flags === 'redeploy' ? '#2E75B6' : '#8B2332');
+  chartHeadcount.data.labels = topFns.map(f => f.name);
+  chartHeadcount.data.datasets[0].data = topFns.map(f => f.reduced);
+  chartHeadcount.data.datasets[0].backgroundColor = barColors;
+  chartHeadcount.update('none');
+
+  // Value chart: Capital freed by segment (using tiered costs)
+  let corpSavings = 0, gceSavings = 0, retailSavings = 0, dcSavings = 0;
+  fnData.forEach(f => {
+    if (f.flags === 'sacred') return;
+    const sav = Math.round(f.reduced * f.costPerFte / 1e6);
+    if (f.segment === 'CORPORATE') corpSavings += sav;
+    else if (f.segment === 'GUEST') gceSavings += sav;
+    else if (f.segment === 'RETAIL') retailSavings += sav;
+    else if (f.segment === 'DISTRIBUTION') dcSavings += sav;
+  });
+  chartValue.data.datasets[0].data = [corpSavings, gceSavings, retailSavings, dcSavings];
+  chartValue.update('none');
+
+  // ═══ TABLE ═══
+  const tbody = document.getElementById('fn-tbody');
+  tbody.innerHTML = '';
+  functions.forEach(f => {
+    if (f[1] === null) {
+      const tr = document.createElement('tr');
+      tr.className = 'segment-row';
+      tr.innerHTML = `<td colspan="6">${f[0]}</td>`;
+      tbody.appendChild(tr);
+      return;
+    }
+    const [seg, name, current, basePct, medPct, aggPct, rationale, flags] = f;
+    const reduction = getReductionPct(basePct, medPct, aggPct, aggression, pace);
+    const reduced = Math.round(current * reduction);
+    const remaining = current - reduced;
+    const pctDisplay = Math.round(reduction * 100);
+    const barWidth = Math.min(pctDisplay, 100);
+
+    let barColor, nameExtra = '', rowClass = '';
+    if (flags === 'sacred') {
+      barColor = '#1b8a5a';
+      nameExtra = '<span class="sacred-badge">Sacred</span>';
+      rowClass = ' sacred-row';
+    } else if (flags === 'redeploy') {
+      barColor = '#2E75B6';
+      nameExtra = '<span class="redeploy-badge">Redeploy</span>';
+    } else {
+      barColor = pctDisplay > 40 ? '#c0392b' : pctDisplay > 20 ? '#d4890b' : '#1b8a5a';
+    }
+
+    const tr = document.createElement('tr');
+    tr.className = rowClass;
+    if (flags === 'sacred') {
+      tr.innerHTML = `
+        <td class="fn-name">${name}${nameExtra}</td>
+        <td class="num">${current.toLocaleString()}</td>
+        <td class="num" style="color:#1b8a5a">\u2014</td>
+        <td class="num">${current.toLocaleString()}</td>
+        <td class="bar-cell"><div style="font-size:11px;font-weight:700;color:#1b8a5a;padding:2px 0">Protected</div></td>
+        <td style="font-size:11px;color:#666;line-height:1.4">${rationale}</td>
+      `;
+    } else {
+      tr.innerHTML = `
+        <td class="fn-name">${name}${nameExtra}</td>
+        <td class="num">${current.toLocaleString()}</td>
+        <td class="num" style="color:${barColor}">${reduced > 0 ? '-' + reduced.toLocaleString() : '\u2014'}</td>
+        <td class="num">${remaining.toLocaleString()}</td>
+        <td class="bar-cell"><div class="bar-bg" style="width:${barWidth}%;background:${barColor}">${pctDisplay}%</div></td>
+        <td style="font-size:11px;color:#666;line-height:1.4">${rationale}</td>
+      `;
+    }
+    tbody.appendChild(tr);
+  });
+}
+
+// ═══ INIT CHARTS ═══
+window.addEventListener('DOMContentLoaded', () => {
+  const barOpts = {indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:'#f0f0f0'},ticks:{font:{size:10}}},y:{grid:{display:false},ticks:{font:{size:10}}}}};
+
+  chartHeadcount = new Chart(document.getElementById('chart-headcount'), {
+    type: 'bar',
+    data: { labels: [], datasets: [{ data: [], backgroundColor: '#8B2332', borderRadius: 4, barThickness: 18 }] },
+    options: {...barOpts, plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.raw.toLocaleString()} FTEs ${ctx.label}`}}}}
+  });
+
+  chartValue = new Chart(document.getElementById('chart-value'), {
+    type: 'bar',
+    data: {
+      labels: ['Corporate\nFunctions', 'Guest Education\nCenter', 'Retail\nStores', 'Distribution\n& Logistics'],
+      datasets: [{ data: [], backgroundColor: ['#8B2332','#C4384A','#D4606E','#5C1722'], borderRadius: 4 }]
+    },
+    options: {responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{grid:{color:'#f0f0f0'},ticks:{font:{size:10},callback:v=>'$'+v+'M'}}}}
+  });
+
+  update();
+});
+</script>
+</body>
+</html>
